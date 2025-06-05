@@ -1,19 +1,20 @@
 import { useState } from "react";
 import { EditForm } from "./EditForm";
-
-interface Product {
-    _id: string;
-    title: string;
-    quantity: number;
-    price: number;
-}
+import type { Product as ProductType, NewProduct } from "../types";
 
 interface ProductProps {
-  product: Product;
+  product: ProductType;
+  onUpdateProduct: (id: string, updatedProduct: NewProduct) => void;
+  onDeleteProduct: (id: string) => void;
+  onAddToCart: (id: string) => void;
 }
 
-export const Product:React.FC<ProductProps> = ({ product }) => {
+export const Product:React.FC<ProductProps> = ({ product, onUpdateProduct, onDeleteProduct, onAddToCart }) => {
   const [showEdit, setShowEdit] = useState(false);
+
+  const handleToggleEditForm = (formState: boolean) => {
+    setShowEdit(formState);
+  }
 
   return (
     <>
@@ -23,15 +24,15 @@ export const Product:React.FC<ProductProps> = ({ product }) => {
           <p className="price">${product.price}</p>
           <p className="quantity">{product.quantity} left in stock</p>
           <div className="actions product-actions">
-            <button className="add-to-cart">Add to Cart</button>
+            <button className="add-to-cart" onClick={() => onAddToCart(product._id)}>Add to Cart</button>
             {(!showEdit) && (
               <button className="edit" onClick={() => setShowEdit(true)}>Edit</button>
             )}
             {(showEdit) && (
-              <EditForm onCancel={() => setShowEdit(false)} product={product}/>
+              <EditForm onCancel={() => setShowEdit(false)} product={product} onUpdateProduct={onUpdateProduct} onToggle={handleToggleEditForm} />
             )}
           </div>
-          <button className="delete-button"><span>X</span></button>
+          <button className="delete-button" onClick={() => onDeleteProduct(product._id)}><span>X</span></button>
         </div>
       </li>
     </>

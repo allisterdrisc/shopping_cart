@@ -1,24 +1,21 @@
 import { Product } from "./Product";
-
-interface Product {
-    _id: string;
-    title: string;
-    quantity: number;
-    price: number;
-}
+import type { Product as ProductType, NewProduct } from '../types';
 
 interface ProductListProps {
-  products: Product[];
+  products: ProductType[];
+  onUpdateProduct: (id: string, updatedProduct: NewProduct) => void;
+  onDeleteProduct: (id: string) => void;
+  onAddToCart: (id: string) => void;
 }
 
-export const ProductList:React.FC<ProductListProps> = ({ products }) => {
+export const ProductList:React.FC<ProductListProps> = ({ products, onUpdateProduct, onDeleteProduct, onAddToCart }) => {
   return (
     <>
     <div className="product-listing">
         <h2>Products</h2>
         <ul className="product-list">
           {products.map((product) => (
-            <Product product={product} key={product._id}/>
+            <Product product={product} key={product._id} onUpdateProduct={onUpdateProduct} onDeleteProduct={onDeleteProduct} onAddToCart={onAddToCart}/>
           ))}
         </ul>
       </div>

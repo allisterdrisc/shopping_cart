@@ -20,6 +20,7 @@ export const addProduct = async (newProduct: NewProduct) => {
     return productSchema.parse(data);
   } catch (e) {
     console.error(e);
+    throw e;
   }
 }
 
@@ -30,6 +31,7 @@ export const updateProduct = async (productId: string, updatedProduct: NewProduc
     return productSchema.parse(data);
   } catch (e) {
     console.error(e);
+    throw e;
   }
 }
 
@@ -39,6 +41,7 @@ export const deleteProduct = async (productId: string) => {
     await axios.delete(`/api/products/${productId}`);
   } catch (e) {
     console.error(e);
+    throw e;
   }
 }
 
@@ -49,6 +52,7 @@ export const getCartItems = async () => {
     return itemsSchema.parse(data);
   } catch (e) {
     console.error(e);
+    throw e;
   }
 }
 
@@ -59,6 +63,7 @@ export const checkoutCart = async () => {
     return null;
   } catch (e) {
     console.error(e);
+    throw e;
   }
 }
 
@@ -69,5 +74,6 @@ export const addItemToCart = async (productId: string) => {
     return newItemSchema.parse(data);
   } catch (e) {
     console.error(e);
+    throw e;
   }
 }

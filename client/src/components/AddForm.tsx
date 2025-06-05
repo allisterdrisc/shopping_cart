@@ -1,16 +1,18 @@
 import { useState } from 'react';
-import { addProduct } from '../services';
+import type { NewProduct } from '../types';
 
 interface AddFormProps {
   onCancel: () => void;
+  onAddProduct: (product: NewProduct) => void;
+  onToggle: (formState: boolean) => void;
 }
 
-export const AddForm:React.FC<AddFormProps> = ({ onCancel }) => {
+export const AddForm:React.FC<AddFormProps> = ({ onCancel, onAddProduct, onToggle }) => {
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
   const [quantity, setQuantity] = useState("");
 
-  async function handleSubmit(event: React.FormEvent<HTMLButtonElement>) {
+  async function handleSubmit(event: React.SyntheticEvent) {
     event.preventDefault();
   
     const newProduct = {
@@ -19,12 +21,17 @@ export const AddForm:React.FC<AddFormProps> = ({ onCancel }) => {
       quantity: Number(quantity),
     }
 
-    await addProduct(newProduct);
+    onAddProduct(newProduct);
+
+    setTitle('');
+    setPrice('');
+    setQuantity('');
+    onToggle(false);
   }
 
   return (
     <>
-        <form>
+        <form onSubmit={handleSubmit}>
           <div className="input-group">
             <label htmlFor="product-name">Product Name:</label>
             <input
@@ -62,7 +69,7 @@ export const AddForm:React.FC<AddFormProps> = ({ onCancel }) => {
             />
           </div>
           <div className="actions form-actions">
-            <button type="submit" onSubmit={handleSubmit}>Add</button>
+            <button type="submit">Add</button>
             <button type="button" onClick={onCancel}>Cancel</button>
           </div>
         </form>

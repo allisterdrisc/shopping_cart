@@ -1,19 +1,36 @@
-interface Product {
-    _id: string;
-    title: string;
-    quantity: number;
-    price: number;
-}
+import { useState } from 'react';
+import type { Product, NewProduct } from '../types';
 
 interface EditFormProps {
   onCancel: () => void;
   product: Product;
+  onUpdateProduct: (id: string, updatedProduct: NewProduct) => void;
+  onToggle: (formState: boolean) => void;
 }
 
-export const EditForm:React.FC<EditFormProps> = ({ onCancel, product }) => {
+export const EditForm:React.FC<EditFormProps> = ({ onCancel, product, onUpdateProduct, onToggle }) => {
+  const [title, setTitle] = useState(product.title || '');
+  const [price, setPrice] = useState<string | undefined>(String(product.price)) || undefined;
+  const [quantity, setQuantity] = useState<string | undefined>(String(product.quantity)) || undefined;
+
+  async function handleSubmit(event: React.SyntheticEvent) {
+    event.preventDefault();
+  
+
+    const updatedProduct = {
+      title: title,
+      price: Number(price),
+      quantity: Number(quantity),
+    }
+
+    onUpdateProduct(product._id, updatedProduct);
+    
+    onToggle(false);
+  }
+
   return (
     <>
-        <form>
+        <form onSubmit={handleSubmit}>
           <div className="input-group">
             <label htmlFor="product-name">Product Name:</label>
             <input
@@ -21,8 +38,8 @@ export const EditForm:React.FC<EditFormProps> = ({ onCancel, product }) => {
               id="product-name"
               name="product-name"
               required
-              defaultValue={product.title}
-              
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
             />
           </div>
           <div className="input-group">
@@ -34,7 +51,8 @@ export const EditForm:React.FC<EditFormProps> = ({ onCancel, product }) => {
               min="0"
               step="0.01"
               required
-              defaultValue={product.price}
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
               
             />
           </div>
@@ -46,7 +64,8 @@ export const EditForm:React.FC<EditFormProps> = ({ onCancel, product }) => {
               name="product-quantity"
               min="0"
               required
-              defaultValue={product.quantity}
+              value={quantity}
+              onChange={(e) => setQuantity(e.target.value)}
               
             />
           </div>
