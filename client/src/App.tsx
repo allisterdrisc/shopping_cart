@@ -27,7 +27,12 @@ interface DeleteAction {
   id: string;
 }
 
-type ProductAction = FetchAction | AddAction | UpdateAction | DeleteAction;
+interface SortProducts {
+  type: 'SORT_PRODUCTS';
+  sortBy: 'title' | 'price' | 'quantity' | undefined;
+}
+
+type ProductAction = FetchAction | AddAction | UpdateAction | DeleteAction | SortProducts;
 
 function productReducer(products: Product[], action: ProductAction) {
   switch (action.type) {
@@ -44,10 +49,25 @@ function productReducer(products: Product[], action: ProductAction) {
         } else {
           return product;
         }
-      })
+      });
     }
     case 'DELETE_PRODUCT': {
       return products.filter((product) => product._id !== action.id)
+    }
+    case 'SORT_PRODUCTS': {
+      console.log(`sorting products by ${action.sortBy}....`);
+      const sortByProp = action.sortBy;
+      if (!sortByProp) return products;
+
+      return products.slice().sort((a, b) => {
+        if (a[sortByProp] < b[sortByProp]) {
+          return -1;
+        } else if (a[sortByProp] > b[sortByProp]) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
     }
   }
 }
@@ -215,6 +235,12 @@ const App = () => {
         </header>
 
         <main>
+          <div>
+            <h4>Sort by:</h4>
+            <button onClick={() => productsDispatch({type: 'SORT_PRODUCTS', sortBy: 'title'})}>Name</button>
+            <button onClick={() => productsDispatch({type: 'SORT_PRODUCTS', sortBy: 'price'})}>Price</button>
+            <button onClick={() => productsDispatch({type: 'SORT_PRODUCTS', sortBy: 'quantity'})}>Quantity</button>
+          </div>
           <ProductList products={products} onUpdateProduct={handleUpdateProduct} onDeleteProduct={handleDeleteProduct} onAddToCart={handleAddToCart}/>
           {!isFormVisible && <AddProductButton handleAddClick={() => setIsFormVisible(true)} />}
           {isFormVisible && (
