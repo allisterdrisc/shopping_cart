@@ -12,7 +12,7 @@ export const AddForm:React.FC<AddFormProps> = ({ onCancel, onAddProduct, onToggl
   const [price, setPrice] = useState("");
   const [quantity, setQuantity] = useState("");
 
-  async function handleSubmit(event: React.SyntheticEvent) {
+  const handleSubmit = async (event: React.SyntheticEvent) => {
     event.preventDefault();
   
     const newProduct = {
@@ -31,7 +31,7 @@ export const AddForm:React.FC<AddFormProps> = ({ onCancel, onAddProduct, onToggl
 
   return (
     <>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} aria-label="Add Product Form">
           <div className="input-group">
             <label htmlFor="product-name">Product Name:</label>
             <input

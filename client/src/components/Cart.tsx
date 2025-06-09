@@ -11,10 +11,16 @@ interface Item extends Product {
 
 interface CartProps {
   items: Item[];
-  cartTotal: number
+  onCheckout: () => void;
 }
 
-export const Cart:React.FC<CartProps> = ({ items, cartTotal }) => {
+export const Cart:React.FC<CartProps> = ({ items, onCheckout }) => {
+  let cartTotal = 0;
+
+  items.forEach(item => (
+    cartTotal += (item.price * item.quantity)
+  ));
+
   if (!items) {
     return (
       <div className="cart">
@@ -48,12 +54,12 @@ export const Cart:React.FC<CartProps> = ({ items, cartTotal }) => {
         </tbody>
         <tfoot>
           <tr>
-            <td colSpan={3} className="total">Total: ${cartTotal}</td>
+            <td colSpan={3} className="total">Total: ${cartTotal.toFixed(2)}</td>
           </tr>
         </tfoot>
       </table>
       <div className="checkout-button">
-        <button className="checkout">Checkout</button>
+        <button className="checkout" onClick={onCheckout}>Checkout</button>
       </div>
     </div>
   )

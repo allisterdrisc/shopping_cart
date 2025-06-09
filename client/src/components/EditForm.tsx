@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Product, NewProduct } from '../types';
 
 interface EditFormProps {
@@ -13,7 +13,11 @@ export const EditForm:React.FC<EditFormProps> = ({ onCancel, product, onUpdatePr
   const [price, setPrice] = useState<string | undefined>(String(product.price)) || undefined;
   const [quantity, setQuantity] = useState<string | undefined>(String(product.quantity)) || undefined;
 
-  async function handleSubmit(event: React.SyntheticEvent) {
+  useEffect(() => {
+    setQuantity(String(product.quantity))
+  }, [product.quantity, setQuantity]);
+
+  const handleSubmit = async (event: React.SyntheticEvent) => {
     event.preventDefault();
   
 
@@ -30,7 +34,7 @@ export const EditForm:React.FC<EditFormProps> = ({ onCancel, product, onUpdatePr
 
   return (
     <>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} aria-label="Edit Product Form">
           <div className="input-group">
             <label htmlFor="product-name">Product Name:</label>
             <input
