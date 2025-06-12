@@ -3,6 +3,9 @@ import { AddForm } from "./components/AddForm";
 import { AddProductButton } from "./components/AddProductButton";
 import { Cart } from "./components/Cart";
 import { ProductList } from "./components/ProductList";
+import { SortButton } from './components/SortButton';
+import { ThemeButton } from './components/ThemeButton';
+import { CurrencyButton } from './components/CurrencyButton';
 import type { Product, Item, NewProduct } from "./types";
 import { addItemToCart, addProduct, checkoutCart, deleteProduct, getCartItems, getProducts, updateProduct } from './services';
 
@@ -27,12 +30,19 @@ interface DeleteAction {
   id: string;
 }
 
-interface SortProducts {
-  type: 'SORT_PRODUCTS';
-  sortBy: 'title' | 'price' | 'quantity' | undefined;
+interface SortProductsByStr {
+  type: 'SORT_PRODUCTS_STR';
+  sortBy: 'title';
+  direction: 'ascending' | 'descending';
 }
 
-type ProductAction = FetchAction | AddAction | UpdateAction | DeleteAction | SortProducts;
+interface SortProductsByNum {
+  type: 'SORT_PRODUCTS_NUM';
+  sortBy: 'price' | 'quantity';
+  direction: 'ascending' | 'descending';
+}
+
+type ProductAction = FetchAction | AddAction | UpdateAction | DeleteAction | SortProductsByStr | SortProductsByNum;
 
 function productReducer(products: Product[], action: ProductAction) {
   switch (action.type) {
@@ -54,20 +64,55 @@ function productReducer(products: Product[], action: ProductAction) {
     case 'DELETE_PRODUCT': {
       return products.filter((product) => product._id !== action.id)
     }
-    case 'SORT_PRODUCTS': {
-      console.log(`sorting products by ${action.sortBy}....`);
+    case 'SORT_PRODUCTS_STR': {
       const sortByProp = action.sortBy;
       if (!sortByProp) return products;
-
-      return products.slice().sort((a, b) => {
-        if (a[sortByProp] < b[sortByProp]) {
-          return -1;
-        } else if (a[sortByProp] > b[sortByProp]) {
-          return 1;
-        } else {
-          return 0;
-        }
-      });
+      if (action.direction === 'ascending') {
+        return products.slice().sort((a, b) => {
+          if (a[sortByProp].toLowerCase() < b[sortByProp].toLowerCase()) {
+            return -1;
+          } else if (a[sortByProp].toLowerCase() > b[sortByProp].toLowerCase()) {
+            return 1;
+          } else {
+            return 0;
+          }
+        });
+      } else {
+        return products.slice().sort((b, a) => {
+          if (a[sortByProp].toLowerCase() < b[sortByProp].toLowerCase()) {
+            return -1;
+          } else if (a[sortByProp].toLowerCase() > b[sortByProp].toLowerCase()) {
+            return 1;
+          } else {
+            return 0;
+          }
+        });
+      }
+    }
+    case 'SORT_PRODUCTS_NUM': {
+      const sortByProp = action.sortBy;
+      if (!sortByProp) return products;
+      if (action.direction === 'ascending') {
+        return products.slice().sort((a, b) => {
+          if (a[sortByProp] < b[sortByProp]) {
+            return -1;
+          } else if (a[sortByProp] > b[sortByProp]) {
+            return 1;
+          } else {
+            return 0;
+          }
+        });
+      } else {
+        return products.slice().sort((b, a) => {
+          if (a[sortByProp] < b[sortByProp]) {
+            return -1;
+          } else if (a[sortByProp] > b[sortByProp]) {
+            return 1;
+          } else {
+            return 0;
+          }
+        });
+      }
     }
   }
 }
@@ -189,6 +234,15 @@ const App = () => {
     }
   };
 
+  const handleSortProducts = (sortBy: 'title' | 'price' | 'quantity', clickedCount: number) => {
+    const direction = (clickedCount % 2 === 0) ? 'ascending' : 'descending';
+    if (sortBy === 'title') {
+      productsDispatch({type: 'SORT_PRODUCTS_STR', sortBy: sortBy, direction: direction})
+    } else {
+      productsDispatch({type: 'SORT_PRODUCTS_NUM', sortBy: sortBy, direction: direction})
+    }
+  }
+
   const handleAddToCart = async (productId: string) => {
     const product = products.find((product) => product._id === productId);
     const existingItem = items.find((item) => item.productId === productId);
@@ -235,11 +289,13 @@ const App = () => {
         </header>
 
         <main>
+          <ThemeButton />
+          <CurrencyButton />
           <div>
             <h4>Sort by:</h4>
-            <button onClick={() => productsDispatch({type: 'SORT_PRODUCTS', sortBy: 'title'})}>Name</button>
-            <button onClick={() => productsDispatch({type: 'SORT_PRODUCTS', sortBy: 'price'})}>Price</button>
-            <button onClick={() => productsDispatch({type: 'SORT_PRODUCTS', sortBy: 'quantity'})}>Quantity</button>
+            <SortButton sortBy='title' onClick={handleSortProducts} />
+            <SortButton sortBy='price' onClick={handleSortProducts} />
+            <SortButton sortBy='quantity' onClick={handleSortProducts} />
           </div>
           <ProductList products={products} onUpdateProduct={handleUpdateProduct} onDeleteProduct={handleDeleteProduct} onAddToCart={handleAddToCart}/>
           {!isFormVisible && <AddProductButton handleAddClick={() => setIsFormVisible(true)} />}

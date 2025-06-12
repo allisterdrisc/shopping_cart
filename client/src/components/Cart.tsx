@@ -1,3 +1,6 @@
+import { useContext } from "react";
+import { CurrencyContext } from "../CurrencyContext";
+
 interface Product {
     _id: string;
     title: string;
@@ -15,6 +18,8 @@ interface CartProps {
 }
 
 export const Cart:React.FC<CartProps> = ({ items, onCheckout }) => {
+  const { currency, rates } = useContext(CurrencyContext);
+  const currencySymbol = currency === 'USD' ? '$' : '£'
   let cartTotal = 0;
 
   items.forEach(item => (
@@ -48,13 +53,13 @@ export const Cart:React.FC<CartProps> = ({ items, onCheckout }) => {
             <tr key={item._id}>
               <td>{item.title}</td>
               <td>{item.quantity}</td>
-              <td>${item.price}</td>
+              <td>{currencySymbol}{(item.price * rates[currency]).toFixed(2)}</td>
             </tr>
           ))}
         </tbody>
         <tfoot>
           <tr>
-            <td colSpan={3} className="total">Total: ${cartTotal.toFixed(2)}</td>
+            <td colSpan={3} className="total">Total: {currencySymbol}{(cartTotal * rates[currency]).toFixed(2)}</td>
           </tr>
         </tfoot>
       </table>

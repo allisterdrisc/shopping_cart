@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { EditForm } from "./EditForm";
 import type { Product as ProductType, NewProduct } from "../types";
+import { useContext } from "react";
+import { CurrencyContext } from "../CurrencyContext";
 
 interface ProductProps {
   product: ProductType;
@@ -11,7 +13,8 @@ interface ProductProps {
 
 export const Product:React.FC<ProductProps> = ({ product, onUpdateProduct, onDeleteProduct, onAddToCart }) => {
   const [showEdit, setShowEdit] = useState(false);
-
+  const { currency, rates } = useContext(CurrencyContext);
+  const currencySymbol = currency === 'USD' ? '$' : '£'
   const handleToggleEditForm = (formState: boolean) => {
     setShowEdit(formState);
   }
@@ -21,7 +24,7 @@ export const Product:React.FC<ProductProps> = ({ product, onUpdateProduct, onDel
       <li className="product">
         <div className="product-details">
           <h3>{product.title}</h3>
-          <p className="price">${product.price}</p>
+          <p className="price">{currencySymbol}{(product.price * rates[currency]).toFixed(2)}</p>
           <p className="quantity">{product.quantity} left in stock</p>
           <div className="actions product-actions">
             <button className="add-to-cart" onClick={() => onAddToCart(product._id)}>Add to Cart</button>

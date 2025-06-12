@@ -77,3 +77,17 @@ export const addItemToCart = async (productId: string) => {
     throw e;
   }
 }
+
+// get currency rate
+export const getCurrencyRates = async () => {
+  try {
+    const { data } = await axios.get('https://open.er-api.com/v6/latest/USD');
+    return {
+      EUR: data.rates.EUR,
+      USD: 1,
+    }
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
+}
